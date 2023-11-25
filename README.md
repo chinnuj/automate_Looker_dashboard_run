@@ -1,16 +1,19 @@
-# Automate triggering Looker Dashboard using Looker API (looker-sdk Python)
-## What was the 'issue'?
-  1) Looker provides a datagroups to invalidate the cache but no feature to re cache the queries unless someone manually open the dashboard and runs it.
-  2) I have a dashboard, whose underlying tables refreshes at odd hours once in a month. The tables are huge, so I cannot predict the time for the end of table load.
-  3) The dashboard queries had better chance of performing better once the queries are cached, atleast the default ones on the dashboard.
-  4) The script should trigger the dashboard from the data engineering job/workflow.
+## Overview
+This is an Automation script, created to run Looker dashbaord queries,without having to manually open the dashbaord in a browser. This will help cache these queries on the Looker, hence getting improved performance right after data refresh.
 
-## Solutions:
-There were 3 solutions to the problem,
-  1) Create a script to open a url in a browser.<br>
-     Challenges:
-       1) The script gets executed in a cluster (Databricks Cluster), not a UI. The urlopen donot actually open a tab in a browser, and Looker requires dashbaord to be opened for the queries to get triggered.
-       2) Requires embed user creation, which can get messy.
-     
-  2) Create a script using the Looker API, which builds the queries on the dashbaord with default filters applied to it and executes it.
-  4) A Solution with cost associated is to use power automate: create a workflow to open a webbrowser based on a trigger. 
+Note: This script only runs the dashboard queries for the default filters set on the dashbaord.
+
+## Key Steps:
+Install the Looker SDK: Looker SDK provides a set of API's to interact with your Looker instance through programming Languages. This step involves using pip to install the Looker SDK (pip install looker-sdk) .
+
+Set the paramters and keys: Set the parmaeters for the script, such as Environment, Sector. Also get the secret keys and set the global variables to initialise the Looker SDK
+
+Initialise the Looker SDK: Use the secret keys to configure nad initialise a Looker SDK object, which will be used for the API calls.
+
+Get Dashboard Details: Use the Looker API called dashboard, to get all details of the dashbaord as a JSON object.
+
+Get Query Details of the visualisation: Parse the JSON dashboard object for each Visualisation's query details, which includes the fields, default filters and any sorting etc.
+
+Create the Query: Create a query with the details retrieved from the dashboard JSON object using the Looker API called create_query.
+
+Run the query of the visualisation: Run the query created by passing the query ID using the Looker API called create_query_task.
